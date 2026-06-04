@@ -1,4 +1,4 @@
-# PRUEBA DEL TRANSFORMER CON BASE DE REGIONES FLANQUEANTES
+# PRUEBA DEL TRANSFORMER CON BASE DE REGIONES FLANQUEANTES CON BASE REDUCIDA
 
 import numpy as np
 import pandas as pd
@@ -10,7 +10,7 @@ from sklearn.metrics import roc_auc_score, average_precision_score, f1_score, cl
 from datasets import Dataset, DatasetDict
 from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassification, TrainingArguments, Trainer, DataCollatorWithPadding, EarlyStoppingCallback
 
-base = pd.read_csv("/home/jbs1009/TFM/datosGene4PD/base_flanqueantes_50_OR_3109_con_rsid_extendida.csv", sep = ",", index_col = False)
+base = pd.read_csv("/home/jbs1009/TFM/datosGene4PD/base_flanqueantes_50_OR_2400_reducida_extendida.csv", sep = ",", index_col = False)
 etiqueta_binaria = {"Sano": 0, "Riesgo_PD": 1}
 base["labels"] = base["labels"].map(etiqueta_binaria)
 
@@ -108,9 +108,9 @@ for name, param in model.named_parameters():
     else:
         param.requires_grad = False
 
-parametros_entrenables = sum(p.numel() for p in model.parameters() if p.requires_grad)
+# parametros_entrenables = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
-print(f"Parámetros entrenables: {parametros_entrenables}")
+# print(f"Parámetros entrenables: {parametros_entrenables}")
 
 data_collator = DataCollatorWithPadding(tokenizer = tokenizer)
 
@@ -149,7 +149,16 @@ training_args = TrainingArguments(
 #     callbacks=[EarlyStoppingCallback(early_stopping_patience=15)]
 # )
 
-trainer = WeightedTrainer(
+# trainer = WeightedTrainer(
+#     model=model,
+#     args=training_args,
+#     train_dataset=hf_base_tokenizada["train"],
+#     eval_dataset=hf_base_tokenizada["validation"],
+#     data_collator=data_collator,
+#     compute_metrics=compute_metrics
+# )
+
+trainer = Trainer(
     model=model,
     args=training_args,
     train_dataset=hf_base_tokenizada["train"],
