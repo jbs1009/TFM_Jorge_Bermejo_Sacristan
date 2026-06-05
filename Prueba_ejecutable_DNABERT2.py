@@ -10,7 +10,7 @@ from sklearn.metrics import roc_auc_score, average_precision_score, f1_score, cl
 from datasets import Dataset, DatasetDict
 from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassification, TrainingArguments, Trainer, DataCollatorWithPadding, EarlyStoppingCallback
 
-base = pd.read_csv("/home/jbs1009/TFM/datosGene4PD/base_flanqueantes_50_OR_2400_reducida_extendida.csv", sep = ",", index_col = False)
+base = pd.read_csv("/home/jbs1009/TFM/datosGene4PD/base_flanqueantes_500_OR_3109_con_rsid_extendida.csv", sep = ",", index_col = False)
 etiqueta_binaria = {"Sano": 0, "Riesgo_PD": 1}
 base["labels"] = base["labels"].map(etiqueta_binaria)
 
@@ -120,7 +120,7 @@ training_args = TrainingArguments(
     per_device_train_batch_size=4,
     gradient_accumulation_steps=4,      
     per_device_eval_batch_size=8,
-    num_train_epochs=1000,                 
+    num_train_epochs=5000,                 
     weight_decay=0.01,
     warmup_ratio=0.1,
     lr_scheduler_type="cosine",
