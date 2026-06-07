@@ -1,4 +1,4 @@
-# PRUEBA DEL TRANSFORMER CON BASE DE REGIONES FLANQUEANTES VENTANA 500 REDUCIDA, MAYÚSCULAS
+# PRUEBA DEL TRANSFORMER CON BASE DE REGIONES FLANQUEANTES VENTANA 500 REDUCIDA, MAYÚSCULAS, 500 EPOCAS, SIN WARMUP RATIO Y SIN CONGELAR
 
 import numpy as np
 import pandas as pd
@@ -101,12 +101,12 @@ model = AutoModelForSequenceClassification.from_pretrained(
     trust_remote_code=True
 )
 
-for name, param in model.named_parameters():
-    if "classifier" in name or "score" in name:
-        param.requires_grad = True
+# for name, param in model.named_parameters():
+#     if "classifier" in name or "score" in name:
+#         param.requires_grad = True
 
-    else:
-        param.requires_grad = False
+#     else:
+#         param.requires_grad = False
 
 # parametros_entrenables = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
@@ -120,8 +120,7 @@ training_args = TrainingArguments(
     per_device_train_batch_size=4,
     gradient_accumulation_steps=4,      
     per_device_eval_batch_size=8,
-    num_train_epochs=500,
-    warmup_ratio=0.1,                 
+    num_train_epochs=500,                 
     weight_decay=0.01,
     lr_scheduler_type="cosine",
 
