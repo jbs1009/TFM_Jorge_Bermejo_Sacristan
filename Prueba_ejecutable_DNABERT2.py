@@ -1,4 +1,4 @@
-# PRUEBA DEL TRANSFORMER CON BASE DE REGIONES FLANQUEANTES CON BASE REDUCIDA
+# PRUEBA DEL TRANSFORMER CON BASE DE REGIONES FLANQUEANTES REDUCIDA, MAYÚSCULAS
 
 import numpy as np
 import pandas as pd
@@ -10,7 +10,7 @@ from sklearn.metrics import roc_auc_score, average_precision_score, f1_score, cl
 from datasets import Dataset, DatasetDict
 from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassification, TrainingArguments, Trainer, DataCollatorWithPadding, EarlyStoppingCallback
 
-base = pd.read_csv("/home/jbs1009/TFM/datosGene4PD/base_flanqueantes_500_OR_3109_con_rsid_extendida.csv", sep = ",", index_col = False)
+base = pd.read_csv("/home/jbs1009/TFM/datosGene4PD/base_flanqueantes_500_OR_2400_reducida_extendida.csv", sep = ",", index_col = False)
 etiqueta_binaria = {"Sano": 0, "Riesgo_PD": 1}
 base["labels"] = base["labels"].map(etiqueta_binaria)
 
@@ -39,7 +39,7 @@ hf_dataset = DatasetDict({
 tokenizer = AutoTokenizer.from_pretrained("zhihan1996/DNABERT-2-117M", trust_remote_code=True)
 
 def tokeniza_secuencias(batch):
-    return tokenizer(batch["Secuencia"])
+    return tokenizer([s.upper() for s in batch["Secuencia"]])
 
 hf_base_tokenizada = hf_dataset.map(
     tokeniza_secuencias, 
@@ -101,12 +101,12 @@ model = AutoModelForSequenceClassification.from_pretrained(
     trust_remote_code=True
 )
 
-for name, param in model.named_parameters():
-    if "classifier" in name or "score" in name:
-        param.requires_grad = True
+# for name, param in model.named_parameters():
+#     if "classifier" in name or "score" in name:
+#         param.requires_grad = True
 
-    else:
-        param.requires_grad = False
+#     else:
+#         param.requires_grad = False
 
 # parametros_entrenables = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
@@ -120,9 +120,8 @@ training_args = TrainingArguments(
     per_device_train_batch_size=4,
     gradient_accumulation_steps=4,      
     per_device_eval_batch_size=8,
-    num_train_epochs=5000,                 
+    num_train_epochs=1000,                 
     weight_decay=0.01,
-    warmup_ratio=0.1,
     lr_scheduler_type="cosine",
 
 
