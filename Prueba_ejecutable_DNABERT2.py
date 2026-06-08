@@ -1,4 +1,4 @@
-# PRUEBA DEL TRANSFORMER CON BASE DE REGIONES FLANQUEANTES VENTANA 500 REDUCIDA, MAYÚSCULAS, 500 EPOCAS, SIN WARMUP RATIO Y SIN CONGELAR
+# PRUEBA DEL TRANSFORMER CON BASE DE REGIONES FLANQUEANTES VENTANA 500 REDUCIDA, MAYÚSCULAS, 50 EPOCAS, SIN WARMUP RATIO, SIN CONGELAR y CON WeightedTrainer
 
 import numpy as np
 import pandas as pd
@@ -120,7 +120,7 @@ training_args = TrainingArguments(
     per_device_train_batch_size=4,
     gradient_accumulation_steps=4,      
     per_device_eval_batch_size=8,
-    num_train_epochs=500,                 
+    num_train_epochs=50,                 
     weight_decay=0.01,
     lr_scheduler_type="cosine",
 
@@ -148,16 +148,7 @@ training_args = TrainingArguments(
 #     callbacks=[EarlyStoppingCallback(early_stopping_patience=15)]
 # )
 
-# trainer = WeightedTrainer(
-#     model=model,
-#     args=training_args,
-#     train_dataset=hf_base_tokenizada["train"],
-#     eval_dataset=hf_base_tokenizada["validation"],
-#     data_collator=data_collator,
-#     compute_metrics=compute_metrics
-# )
-
-trainer = Trainer(
+trainer = WeightedTrainer(
     model=model,
     args=training_args,
     train_dataset=hf_base_tokenizada["train"],
@@ -165,6 +156,15 @@ trainer = Trainer(
     data_collator=data_collator,
     compute_metrics=compute_metrics
 )
+
+# trainer = Trainer(
+#     model=model,
+#     args=training_args,
+#     train_dataset=hf_base_tokenizada["train"],
+#     eval_dataset=hf_base_tokenizada["validation"],
+#     data_collator=data_collator,
+#     compute_metrics=compute_metrics
+# )
 
 
 trainer.train()
