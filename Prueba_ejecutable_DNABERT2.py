@@ -1,4 +1,4 @@
-# PRUEBA DEL TRANSFORMER CON BASE DE REGIONES FLANQUEANTES VENTANA 500 REDUCIDA, MAYÚSCULAS, 50 EPOCAS, SIN WARMUP RATIO, SIN CONGELAR y CON WeightedTrainer
+# PRUEBA DEL TRANSFORMER CON BASE DE REGIONES FLANQUEANTES VENTANA 50 REDUCIDA, MAYÚSCULAS, 50 EPOCAS, SIN WARMUP RATIO, SIN CONGELAR y CON WeightedTrainer
 
 import numpy as np
 import pandas as pd
@@ -10,7 +10,7 @@ from sklearn.metrics import roc_auc_score, average_precision_score, f1_score, cl
 from datasets import Dataset, DatasetDict
 from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassification, TrainingArguments, Trainer, DataCollatorWithPadding, EarlyStoppingCallback
 
-base = pd.read_csv("/home/jbs1009/TFM/datosGene4PD/base_flanqueantes_500_OR_2400_reducida_extendida.csv", sep = ",", index_col = False)
+base = pd.read_csv("/home/jbs1009/TFM/datosGene4PD/base_flanqueantes_50_OR_2400_reducida_extendida.csv", sep = ",", index_col = False)
 etiqueta_binaria = {"Sano": 0, "Riesgo_PD": 1}
 base["labels"] = base["labels"].map(etiqueta_binaria)
 
