@@ -1,0 +1,1 @@
+Incluye Jupyter Notebooks y Ejecutables de las pruebas con el transformer DNABERT-2-117M y otros modelos adicionales como baseline
