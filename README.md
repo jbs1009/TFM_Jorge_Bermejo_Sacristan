@@ -22,4 +22,31 @@ el desorden del movimiento más frecuente. En este Trabajo de Fin de Máster se 
 <img width="1297" height="823" alt="image" src="https://github.com/user-attachments/assets/1f3d5925-71f0-4bae-8e42-8ac06c9c7543" />
 
 
+## Esquema del Repositorio
 
+- PRUEBAS_PROCESAMIENTO_Y_PREPARACION_DATASETS
+  - info.txt
+  - PRIMERA_APROXIMACION
+    - info.txt
+    - Base_final.ipynb
+    - Coodenadas_genes.ipynb
+    - Coordenadas_genes_pruebas.ipynb
+    - Correcciones_tabla_original_pruebas.ipynb
+    - Genes_completos.ipynb
+    - Genoma_completo.ipynb
+  - SEGUNDA APROXIMACION
+    - info.txt
+    - Base_regiones_flanqueantes.ipynb
+    - Flancos_adicionales.ipynb
+    - Regiones_flanqueantes.ipynb
+    - Secuencias_ClinVar.ipynb
+- PRUEBAS_MODELOS
+  - info.txt
+  - Ejecutable_grande.py
+  - Prueba_ejecutable_DNABERT2.py
+  - Pruebas_DNABERT-2.ipynb
+  - Pruebas_DNABERT-distilbert.ipynb
+  - Pruebas_modelos_generales.ipynb
+- DATASETS.zip (únicamente de Regiones Flanqueantes por limitaciones de tamaño máximo de subida)
+- TABLA_RESULTADOS_FINALES_TFM.csv
+- README.md
