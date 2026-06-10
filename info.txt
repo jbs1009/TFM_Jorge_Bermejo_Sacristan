@@ -1,0 +1,1 @@
+Incluye Jupyter Notebooks con las pruebas y código correspondiente al preprocesamiento y preparación de datasets sintéticos, repartidos entre la primera aproximación (Genes Completos) y la segunda aproximación (Regiones Flanqueantes)
