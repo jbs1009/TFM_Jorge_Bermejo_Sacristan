@@ -1,4 +1,4 @@
-# PRUEBA DEL TRANSFORMER CON BASE DE REGIONES FLANQUEANTES VENTANA 50 REDUCIDA, MAYÚSCULAS, 50 EPOCAS, SIN WARMUP RATIO, SIN CONGELAR y CON WeightedTrainer
+# PRUEBA DEL TRANSFORMER CON BASE DE REGIONES FLANQUEANTES VENTANA 500 REDUCIDA, MAYÚSCULAS, 50 ÉPOCAS, SIN WARMUP RATIO, SIN CONGELAR y CON WeightedTrainer
 
 import numpy as np
 import pandas as pd
@@ -10,7 +10,7 @@ from sklearn.metrics import roc_auc_score, average_precision_score, f1_score, cl
 from datasets import Dataset, DatasetDict
 from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassification, TrainingArguments, Trainer, DataCollatorWithPadding, EarlyStoppingCallback
 
-base = pd.read_csv("/home/jbs1009/TFM/datosGene4PD/base_flanqueantes_50_OR_2400_reducida_extendida.csv", sep = ",", index_col = False)
+base = pd.read_csv("base_flanqueantes_500_OR_2400_reducida_extendida.csv", sep = ",", index_col = False)
 etiqueta_binaria = {"Sano": 0, "Riesgo_PD": 1}
 base["labels"] = base["labels"].map(etiqueta_binaria)
 
@@ -34,8 +34,6 @@ hf_dataset = DatasetDict({
 
 
 
-
-
 tokenizer = AutoTokenizer.from_pretrained("zhihan1996/DNABERT-2-117M", trust_remote_code=True)
 
 def tokeniza_secuencias(batch):
@@ -49,10 +47,11 @@ hf_base_tokenizada = hf_dataset.map(
 gc.collect() 
 
 
-class_weights = compute_class_weight("balanced", classes = np.unique(base_train["labels"]), y = base_train["labels"])
+# class_weights = compute_class_weight("balanced", classes = np.unique(base_train["labels"]), y = base_train["labels"])
+
+# weights_tensor = torch.tensor(class_weights, dtype = torch.float32)
 
 weights_tensor = torch.tensor([1.0, 10.0], dtype = torch.float32)
-
 
 class WeightedTrainer(Trainer):
     def compute_loss(self, model, inputs, return_outputs = False):
@@ -76,7 +75,7 @@ def compute_metrics(eval_pred):
     else:
         logits = predictions
 
-    probs = torch.nn.functional.softmax(torch.tensor(logits), dim = -1).numpy()[:, 1]
+    probs = torch.nn.functional.softmax(torch.tensor(logits.astype(float)), dim = -1).numpy()[:, 1]
     preds = np.argmax(logits, axis = 1)
 
     return {
@@ -85,21 +84,16 @@ def compute_metrics(eval_pred):
         "f1": f1_score(labels, preds)
     }
 
-config = AutoConfig.from_pretrained(
-    "zhihan1996/DNABERT-2-117M", 
-    trust_remote_code=True, 
-    num_labels=2
-)
-
-config.pad_token_id = tokenizer.pad_token_id
-config.hidden_dropout_prob = 0.2
-config.attention_probs_dropout_prob = 0.2
 
 model = AutoModelForSequenceClassification.from_pretrained(
-    "zhihan1996/DNABERT-2-117M", 
-    config=config,
-    trust_remote_code=True
+    "zhihan1996/DNABERT-2-117M",
+    trust_remote_code=True,
+    num_labels=2,
+    ignore_mismatched_sizes=True
 )
+model.config.pad_token_id = tokenizer.pad_token_id
+model.config.hidden_dropout_prob = 0.2
+model.config.attention_probs_dropout_prob = 0.2
 
 # for name, param in model.named_parameters():
 #     if "classifier" in name or "score" in name:
@@ -108,9 +102,6 @@ model = AutoModelForSequenceClassification.from_pretrained(
 #     else:
 #         param.requires_grad = False
 
-# parametros_entrenables = sum(p.numel() for p in model.parameters() if p.requires_grad)
-
-# print(f"Parámetros entrenables: {parametros_entrenables}")
 
 data_collator = DataCollatorWithPadding(tokenizer = tokenizer)
 
@@ -138,24 +129,6 @@ training_args = TrainingArguments(
     greater_is_better=True    
 )
 
-# trainer = WeightedTrainer(
-#     model=model,
-#     args=training_args,
-#     train_dataset=hf_base_tokenizada["train"],
-#     eval_dataset=hf_base_tokenizada["validation"],
-#     data_collator=data_collator,
-#     compute_metrics=compute_metrics,
-#     callbacks=[EarlyStoppingCallback(early_stopping_patience=15)]
-# )
-
-trainer = WeightedTrainer(
-    model=model,
-    args=training_args,
-    train_dataset=hf_base_tokenizada["train"],
-    eval_dataset=hf_base_tokenizada["validation"],
-    data_collator=data_collator,
-    compute_metrics=compute_metrics
-)
 
 # trainer = Trainer(
 #     model=model,
@@ -166,6 +139,14 @@ trainer = WeightedTrainer(
 #     compute_metrics=compute_metrics
 # )
 
+trainer = WeightedTrainer(
+    model=model,
+    args=training_args,
+    train_dataset=hf_base_tokenizada["train"],
+    eval_dataset=hf_base_tokenizada["validation"],
+    data_collator=data_collator,
+    compute_metrics=compute_metrics
+)
 
 trainer.train()
 
